@@ -8,7 +8,10 @@
 
 package org.nlogo.editor;
 
+import window.ShowUsageBox;
+
 import java.awt.Component;
+import java.awt.event.MouseEvent;
 
 public strictfp class EditorArea
     extends AbstractEditorArea
@@ -23,18 +26,20 @@ public strictfp class EditorArea
   private final scala.Function1<String, String> i18n;
   private javax.swing.JPopupMenu contextMenu;
   private final DoubleClickCaret caret;
+  private ShowUsageBox showUsageBox;
 
   public EditorArea(int rows, int columns,
                     java.awt.Font font,
                     boolean disableFocusTraversalKeys,
                     java.awt.event.TextListener listener,
                     Colorizer colorizer,
-                    scala.Function1<String, String> i18n) {
+                    scala.Function1<String, String> i18n, ShowUsageBox showUsageBox) {
     this.rows = rows;
     this.columns = columns;
     this.disableFocusTraversalKeys = disableFocusTraversalKeys;
     this.colorizer = colorizer;
     this.i18n = i18n;
+    this.showUsageBox = showUsageBox;
     indenter = new DumbIndenter(this);
     enableEvents(java.awt.AWTEvent.MOUSE_EVENT_MASK);
     addFocusListener(this);
@@ -207,7 +212,7 @@ public strictfp class EditorArea
     }
   }
 
-  String getLineText(int offset)
+  public String getLineText(int offset)
       throws javax.swing.text.BadLocationException {
     javax.swing.text.PlainDocument doc =
         (javax.swing.text.PlainDocument) getDocument();
@@ -231,6 +236,9 @@ public strictfp class EditorArea
 
   int offsetToLine(javax.swing.text.PlainDocument doc, int offset) {
     return doc.getDefaultRootElement().getElementIndex(offset);
+  }
+  public int offsetToLine(int offset) {
+      return ((javax.swing.text.PlainDocument) getDocument()).getDefaultRootElement().getElementIndex(offset);
   }
 
   void insertBeforeEachSelectedLine(String insertion) {
@@ -380,7 +388,7 @@ public strictfp class EditorArea
     colorizer.reset();
     if (!fe.isTemporary()) {
       Actions.setEnabled(false);
-      UndoManager.setCurrentManager(null);
+      org.nlogo.editor.UndoManager.setCurrentManager(null);
     }
   }
 
@@ -403,7 +411,14 @@ public strictfp class EditorArea
       doPopup(me);
       return;
     }
+    if(me.isControlDown() && !me.isPopupTrigger()) {
+      showUsage(me);
+    }
     super.processMouseEvent(me);
+  }
+
+  public void showUsage(MouseEvent me) {
+    showUsageBox.showBox(me, org.nlogo.app.App.app().tabs().codeTab(), EditorArea.this.getCaretPosition(), this);
   }
 
   private class EditorContextMenu extends javax.swing.JPopupMenu {

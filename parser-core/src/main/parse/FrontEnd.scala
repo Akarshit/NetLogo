@@ -2,10 +2,8 @@
 
 package org.nlogo.parse
 
-import org.nlogo.core,
-  core.{AstTransformer, CompilationOperand, CompilationEnvironment, Dialect, DummyCompilationEnvironment, Femto,
-    ExtensionManager, DummyExtensionManager, NetLogoCore, FrontEndInterface, FrontEndProcedure,
-    Program, TokenizerInterface, ProcedureDefinition, ProcedureSyntax}
+import org.nlogo.core
+import org.nlogo.core._
 
 object FrontEnd extends FrontEnd {
   val tokenizer: TokenizerInterface =
@@ -89,5 +87,11 @@ trait FrontEndMain {
   def findIncludes(source: String): Seq[String] = {
     val tokens = tokenizer.tokenizeString(source)
     StructureParser.findIncludes(tokens)
+  }
+
+  def getUsage(source: String, dialectOption: Some[Dialect], token: Token): Seq[Token] = {
+    val dialect = dialectOption.getOrElse(NetLogoCore)
+    val tokens = tokenizer.tokenizeString(source).map(Namer.basicNamer(dialect, new DummyExtensionManager))
+    StructureParser.getUsage(tokens, token)
   }
 }
