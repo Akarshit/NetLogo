@@ -8,10 +8,9 @@
 
 package org.nlogo.editor;
 
-import window.ShowUsageBox;
-
 import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public strictfp class EditorArea
     extends AbstractEditorArea
@@ -26,20 +25,18 @@ public strictfp class EditorArea
   private final scala.Function1<String, String> i18n;
   private javax.swing.JPopupMenu contextMenu;
   private final DoubleClickCaret caret;
-  private ShowUsageBox showUsageBox;
 
   public EditorArea(int rows, int columns,
                     java.awt.Font font,
                     boolean disableFocusTraversalKeys,
                     java.awt.event.TextListener listener,
                     Colorizer colorizer,
-                    scala.Function1<String, String> i18n, ShowUsageBox showUsageBox) {
+                    scala.Function1<String, String> i18n) {
     this.rows = rows;
     this.columns = columns;
     this.disableFocusTraversalKeys = disableFocusTraversalKeys;
     this.colorizer = colorizer;
     this.i18n = i18n;
-    this.showUsageBox = showUsageBox;
     indenter = new DumbIndenter(this);
     enableEvents(java.awt.AWTEvent.MOUSE_EVENT_MASK);
     addFocusListener(this);
@@ -392,6 +389,10 @@ public strictfp class EditorArea
     }
   }
 
+  public void addListener(MouseListener mouseListener){
+    this.addMouseListener(mouseListener);
+  }
+
   // this is used for quick help, when QH is triggered
   // by the context menu we want to look up the word under
   // the mouse pointer without moving the cursor ev 7/3/07
@@ -411,14 +412,7 @@ public strictfp class EditorArea
       doPopup(me);
       return;
     }
-    if(me.isControlDown() && !me.isPopupTrigger()) {
-      showUsage(me);
-    }
     super.processMouseEvent(me);
-  }
-
-  public void showUsage(MouseEvent me) {
-    showUsageBox.showBox(me, org.nlogo.app.App.app().tabs().codeTab(), EditorArea.this.getCaretPosition(), this);
   }
 
   private class EditorContextMenu extends javax.swing.JPopupMenu {

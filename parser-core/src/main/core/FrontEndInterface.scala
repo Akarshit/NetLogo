@@ -50,7 +50,5 @@ trait FrontEndInterface {
 
   // does enough tokenization to be used by the frontEnd
   def tokenizeForColorization(source: String, dialect: Dialect, extensionManager: ExtensionManager): Seq[Token]
-
-  def getUsage(source: String, someDialect: Some[Dialect], token: Token): Seq[Token]
 }
 

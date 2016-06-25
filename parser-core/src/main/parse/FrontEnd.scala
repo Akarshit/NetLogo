@@ -88,10 +88,4 @@ trait FrontEndMain {
     val tokens = tokenizer.tokenizeString(source)
     StructureParser.findIncludes(tokens)
   }
-
-  def getUsage(source: String, dialectOption: Some[Dialect], token: Token): Seq[Token] = {
-    val dialect = dialectOption.getOrElse(NetLogoCore)
-    val tokens = tokenizer.tokenizeString(source).map(Namer.basicNamer(dialect, new DummyExtensionManager))
-    StructureParser.getUsage(tokens, token)
-  }
 }

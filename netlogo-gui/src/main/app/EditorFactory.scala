@@ -4,7 +4,6 @@ package org.nlogo.app
 
 import org.nlogo.api.CompilerServices
 import org.nlogo.core.I18N
-import window.ShowUsageBox
 
 class EditorFactory(compiler: CompilerServices) extends org.nlogo.window.EditorFactory {
   def newEditor(cols: Int, rows: Int, disableFocusTraversal: Boolean) =
@@ -18,10 +17,9 @@ class EditorFactory(compiler: CompilerServices) extends org.nlogo.window.EditorF
     val font = new java.awt.Font(org.nlogo.awt.Fonts.platformMonospacedFont,
                                  java.awt.Font.PLAIN, 12)
     val colorizer = new org.nlogo.window.EditorColorizer(compiler)
-    val showUsage = new ShowUsageBox(compiler)
     class MyCodeEditor
     extends org.nlogo.window.CodeEditor(rows, cols, font, disableFocusTraversal,
-                                        listener, colorizer, I18N.gui.get _, showUsage)
+                                        listener, colorizer, I18N.gui.get _)
     {
       override def focusGained(fe: java.awt.event.FocusEvent) {
         super.focusGained(fe)
