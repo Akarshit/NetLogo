@@ -385,7 +385,7 @@ public strictfp class EditorArea
     colorizer.reset();
     if (!fe.isTemporary()) {
       Actions.setEnabled(false);
-      org.nlogo.editor.UndoManager.setCurrentManager(null);
+      UndoManager.setCurrentManager(null);
     }
   }
 

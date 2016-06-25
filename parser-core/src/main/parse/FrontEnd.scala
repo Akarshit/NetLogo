@@ -2,8 +2,10 @@
 
 package org.nlogo.parse
 
-import org.nlogo.core
-import org.nlogo.core._
+import org.nlogo.core,
+  core.{AstTransformer, CompilationOperand, CompilationEnvironment, Dialect, DummyCompilationEnvironment, Femto,
+    ExtensionManager, DummyExtensionManager, NetLogoCore, FrontEndInterface, FrontEndProcedure,
+    Program, TokenizerInterface, ProcedureDefinition, ProcedureSyntax}
 
 object FrontEnd extends FrontEnd {
   val tokenizer: TokenizerInterface =
