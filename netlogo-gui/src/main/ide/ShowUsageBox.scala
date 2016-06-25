@@ -7,13 +7,10 @@ import java.awt.event._
 import javax.swing.table.{DefaultTableCellRenderer, DefaultTableModel}
 import javax.swing.{JDialog, JScrollPane, JTable}
 
-import org.nlogo.api.CompilerServices
 import org.nlogo.core.{Femto, Token, TokenizerInterface}
 import org.nlogo.editor.EditorArea
 
-import scala.util.parsing.combinator.token.Tokens
-
-class ShowUsageBox (){
+class ShowUsageBox {
   val usageBox = new JDialog()
   val dataModel = new DefaultTableModel(){
     override def isCellEditable(row: Int, column: Int): Boolean = false

@@ -70,8 +70,6 @@ public abstract strictfp class GUIWorkspace // can't be both abstract and strict
   public GLViewManagerInterface glView = null;
   public ViewManager viewManager = new ViewManager();
   private final ExternalFileManager externalFileManager;
-  // for movie capture
-  public org.nlogo.awt.MovieEncoder movieEncoder = null;
   public final NetLogoListenerManager listenerManager;
 
   // for grid snap
@@ -858,12 +856,12 @@ public abstract strictfp class GUIWorkspace // can't be both abstract and strict
     }
     if (owner.ownsPrimaryJobs()) {
       if (e.procedure != null) {
-        jobManager.addJob(owner, agents, e.procedure);
+        jobManager.addJob(owner, agents, this, e.procedure);
       } else {
         new org.nlogo.window.Events.JobRemovedEvent(owner).raiseLater(this);
       }
     } else {
-      jobManager.addSecondaryJob(owner, agents, e.procedure);
+      jobManager.addSecondaryJob(owner, agents, this, e.procedure);
     }
   }
 
@@ -1301,7 +1299,7 @@ public abstract strictfp class GUIWorkspace // can't be both abstract and strict
       };
 
   public final javax.swing.Action switchTo3DViewAction =
-      new javax.swing.AbstractAction("3D View") {
+      new javax.swing.AbstractAction(I18N.guiJ().get("menu.tools.3DView.switch")) {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           open3DView();
         }
