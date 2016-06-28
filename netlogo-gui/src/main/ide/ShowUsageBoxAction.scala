@@ -10,7 +10,6 @@ import org.nlogo.editor.EditorArea
 class ShowUsageBoxAction(showUsageBox: ShowUsageBox) {
   def actionPerformed(me: MouseEvent): Unit = {
     val editorArea = me.getSource.asInstanceOf[EditorArea]
-    showUsageBox.init(editorArea)
     showUsageBox.showBox(me, editorArea.getCaretPosition)
   }
 }

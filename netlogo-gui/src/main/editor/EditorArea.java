@@ -23,7 +23,7 @@ public strictfp class EditorArea
   protected final boolean disableFocusTraversalKeys;
   private final BracketMatcher bracketMatcher;
   private final UndoManager undoManager = new UndoManager();
-  protected final Colorizer colorizer;
+  public final Colorizer colorizer;
   protected IndenterInterface indenter;
   private final scala.Function1<String, String> i18n;
   private javax.swing.JPopupMenu contextMenu;
