@@ -10,7 +10,7 @@ class AggregateProceduresTab(colorizer: Colorizer) extends javax.swing.JPanel {
     50, 75,
     new java.awt.Font(org.nlogo.awt.Fonts.platformMonospacedFont,
                       java.awt.Font.PLAIN, 12),
-    true,
+    false,
     // Dummy listener since the editor is not editable
     new java.awt.event.TextListener() {
         override def textValueChanged(e: java.awt.event.TextEvent) { } },
