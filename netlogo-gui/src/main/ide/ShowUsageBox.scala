@@ -6,6 +6,7 @@ import java.awt.{Color, Component, Cursor}
 import java.awt.event._
 import javax.swing.table.{DefaultTableCellRenderer, DefaultTableModel, TableCellRenderer}
 import javax.swing._
+import javax.swing.text.PlainDocument
 
 import org.nlogo.core.{Femto, Token, TokenType, TokenizerInterface}
 import org.nlogo.editor.{EditorArea, HighlightEditorKit}
@@ -29,7 +30,6 @@ class ShowUsageBox(editorArea: EditorArea) {
   usageBox.addWindowFocusListener(new WindowFocusListener {
     override def windowLostFocus(e: WindowEvent): Unit = {
       usageBox.setVisible(false)
-      dataModel.synchronized(dataModel.setRowCount(0))
     }
 
     override def windowGainedFocus(e: WindowEvent): Unit = {}
@@ -50,7 +50,6 @@ class ShowUsageBox(editorArea: EditorArea) {
     override def mouseClicked(e: MouseEvent): Unit = {
       usageBox.setVisible(false)
       val token = usageTable.getValueAt(usageTable.getSelectedRow, 0).asInstanceOf[Token]
-      dataModel.synchronized(dataModel.setRowCount(0))
       editorArea.select(token.start, token.end)
     }
   })
@@ -91,7 +90,9 @@ class ShowUsageBox(editorArea: EditorArea) {
 
   def getUsage(source: String, token: Token): Iterator[Token] = {
     val iterator = Femto.scalaSingleton[TokenizerInterface]("org.nlogo.lex.Tokenizer").tokenizeString(source)
-    iterator.filter(t => t.text.equalsIgnoreCase(token.text) && t.start != token.start)
+    iterator.filter(t => t.text.equalsIgnoreCase(token.text) &&
+      (editorArea.offsetToLine(editorArea.getDocument.asInstanceOf[PlainDocument],t.start)) !=
+        (editorArea.offsetToLine(editorArea.getDocument.asInstanceOf[PlainDocument], token.start)))
   }
 
   def findTokenContainingPosition(source: String, position: Int): Option[Token] = {
@@ -131,7 +132,7 @@ class ShowUsageBox(editorArea: EditorArea) {
   }
   class LineNumberRenderer extends DefaultTableCellRenderer {
     override def setValue(value: AnyRef) = {
-      setText(editorArea.offsetToLine(value.asInstanceOf[Token].start).toString)
+      setText(editorArea.offsetToLine(editorArea.getDocument.asInstanceOf[PlainDocument], value.asInstanceOf[Token].start).toString)
     }
   }
   import org.nlogo.editor.{ HighlightEditorKit, HighlightView }

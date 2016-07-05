@@ -31,7 +31,7 @@ class CodeTab(val workspace: AbstractWorkspace) extends JPanel
     }
   }
 
-  val text = new EditorFactory(workspace).newEditor(100, 100, true, listener, true)
+  val text = new EditorFactory(workspace).newEditor(100, 100, false, listener, true)
   val showUsageBox = new ShowUsageBox(text)
   val showUsageBoxAction = new ShowUsageBoxAction(showUsageBox)
   val mL = new MouseAdapter {
