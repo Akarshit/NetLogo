@@ -10,12 +10,13 @@ import org.nlogo.core.I18N
 import org.nlogo.window.GUIWorkspace
 
 class ToolsMenu(app: App, modelSaver: ModelSaver) extends org.nlogo.swing.Menu(I18N.gui.get("menu.tools")) {
-
   implicit val i18nName = I18N.Prefix("menu.tools")
 
   setMnemonic('T')
-  addMenuItem(I18N.gui("preferences"), app.showPreferencesDialog _)
-  addSeparator()
+  if (!System.getProperty("os.name").startsWith("Mac")) {
+    addMenuItem(I18N.gui("preferences"), app.showPreferencesDialog _)
+    addSeparator()
+  }
   addMenuItem(new SimpleGUIWorkspaceAction(I18N.gui("halt"), app.workspace, _.halt))
   addSeparator()
   addMenuItem(new SimpleGUIWorkspaceAction(I18N.gui("globalsMonitor"), app.workspace, _.inspectAgent(AgentKind.Observer)))
@@ -74,7 +75,7 @@ class GUIWorkspaceAction(name: String, workspace: GUIWorkspace) extends Abstract
   }
 }
 
-class Open3DViewAction(workspace: GUIWorkspace) extends GUIWorkspaceAction("3DView", workspace) {
+class Open3DViewAction(workspace: GUIWorkspace) extends GUIWorkspaceAction(I18N.gui.get("menu.tools.3DView.switch"), workspace) {
   override def performAction(workspace: GUIWorkspace): Unit = {
     try {
       workspace.glView.open()
