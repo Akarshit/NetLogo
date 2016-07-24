@@ -7,7 +7,7 @@ import javax.swing.text.TextAction
 
 import org.nlogo.api.CompilerServices
 import org.nlogo.core.I18N
-import org.nlogo.ide.{AutoSuggestAction, CodeCompletionPopup, ShowUsageBox, ShowUsageBoxAction}
+import org.nlogo.ide.{AutoSuggestAction, CodeCompletionPopup, ShowUsageBox, ShowUsageBoxAction, JumpToDefinitionAction}
 import org.nlogo.window.CodeEditor
 
 import collection.JavaConversions._
@@ -26,8 +26,8 @@ class EditorFactory(compiler: CompilerServices) extends org.nlogo.window.EditorF
                                  java.awt.Font.PLAIN, 12)
     val colorizer = new org.nlogo.window.EditorColorizer(compiler)
     val codeCompletionPopup = new CodeCompletionPopup()
-    val showUsageBox = new ShowUsageBox()
-    val actions = Seq[Action](new ShowUsageBoxAction(showUsageBox))
+    val showUsageBox = new ShowUsageBox(compiler)
+    val actions = Seq[Action](new ShowUsageBoxAction(showUsageBox), new JumpToDefinitionAction(showUsageBox))
     val actionMap = Map(
       KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SPACE, java.awt.event.InputEvent.CTRL_DOWN_MASK)
       -> new AutoSuggestAction("auto-suggest", codeCompletionPopup))

@@ -8,10 +8,16 @@ import javax.swing.table.{DefaultTableCellRenderer, DefaultTableModel, TableCell
 import javax.swing._
 import javax.swing.text.PlainDocument
 
-import org.nlogo.core.{Femto, Token, TokenType, TokenizerInterface}
+import org.nlogo.api.CompilerServices
+import org.nlogo.core
+import org.nlogo.core.{Color => _, _}
 import org.nlogo.editor.{EditorArea, HighlightEditorKit}
+import org.nlogo.parse.ExpressionParser
 
-class ShowUsageBox() {
+import scala.annotation.tailrec
+import scala.collection.mutable
+
+class ShowUsageBox(compiler: CompilerServices) {
 
   val usageBox = new JDialog()
   var editorArea: EditorArea = null
@@ -198,5 +204,78 @@ class ShowUsageBox() {
       }
     }
     override def create(elem: javax.swing.text.Element): javax.swing.text.View = new BoldView(elem)
+  }
+
+  def jumpToDeclaration(cursorPosition: Int): Unit ={
+    val tokenOption = findTokenContainingPosition(editorArea.getText(), cursorPosition)
+    for(token <- tokenOption) {
+      val t = getDeclaration(token)
+      editorArea.select(t.start, t.end)
+    }
+  }
+
+  def getDeclaration(token: Token): Token = {
+    val iterator = Femto.scalaSingleton[TokenizerInterface]("org.nlogo.lex.Tokenizer").tokenizeString(editorArea.getText()).toSeq
+    val (globals, owns) = parseOwns
+    val indexOfToken = iterator.indexWhere(t => t.start == token.start)
+    var stack = 0
+    for(i <- indexOfToken to 0 by -1) {
+      val tok = iterator(i)
+      if (tok.tpe.equals(TokenType.CloseBracket)) {
+        stack -= 1
+      }
+      if (tok.tpe.equals(TokenType.OpenBracket)) {
+        stack += 1
+      }
+      if(stack == 0 && tok.text.equalsIgnoreCase(token.text) && iterator(i - 1).text.equalsIgnoreCase("let")) {
+        return tok
+      }
+      if(tok.text.equalsIgnoreCase("to") || tok.text.equalsIgnoreCase("to-report")) {
+        // i + 1 is the function name
+        if(iterator(i + 2).tpe.equals(TokenType.OpenBracket)){
+          // Arguments found
+          var argIndex = i + 3
+          var arg = iterator(argIndex)
+          while(!iterator(argIndex).tpe.equals(TokenType.CloseBracket)){
+            if(iterator(argIndex).text.equalsIgnoreCase(token.text)) {
+              return iterator(argIndex)
+            }
+            argIndex += 1
+          }
+        }
+        globals.get(token.text.toLowerCase).foreach(t => return t)
+        owns.get(token.text.toLowerCase).foreach(t => return t)
+      }
+    }
+    globals.get(token.text.toLowerCase).foreach(t => return t)
+    owns.get(token.text.toLowerCase).foreach(t => return t)
+    null
+  }
+
+  def parseOwns = {
+    val globals = scala.collection.mutable.Map[String, Token]()
+    val owns = scala.collection.mutable.Map[String, Token]()
+    val iterator = Femto.scalaSingleton[TokenizerInterface]("org.nlogo.lex.Tokenizer").tokenizeString(editorArea.getText())
+    while(iterator.hasNext) {
+      var token = iterator.next()
+      if (token.text.equalsIgnoreCase("globals")) {
+        token = iterator.next()
+        while (!token.tpe.equals(TokenType.CloseBracket)) {
+          if (token.tpe.equals(TokenType.Ident))
+            globals += token.text -> token
+          token = iterator.next()
+        }
+      }
+      if (token.text.toLowerCase.endsWith("-own")) {
+        token = iterator.next()
+        while (!token.tpe.equals(TokenType.CloseBracket)) {
+          if (token.tpe.equals(TokenType.Ident) && owns.get(token.text).isEmpty) {
+            owns += token.text -> token
+          }
+          token = iterator.next()
+        }
+      }
+    }
+    (globals, owns)
   }
 }
